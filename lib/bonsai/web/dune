@@ -1,0 +1,5 @@
+(library (name bonsai_web)
+ (libraries  bonsai core_kernel.bus core incr_dom
+  core_kernel.moption ui_effect ui_incr virtual_dom
+  bonsai_protocol javascript_profiling)
+ (preprocess (pps ppx_jane js_of_ocaml-ppx)) (public_name bonsai.web))

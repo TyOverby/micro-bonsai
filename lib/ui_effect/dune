@@ -1,0 +1,2 @@
+(library (name ui_effect) (public_name bonsai.ui_effect)
+ (libraries core) (preprocess (pps ppx_jane)))

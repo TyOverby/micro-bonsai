@@ -31,8 +31,8 @@ module Request_ids : sig
     -> set_timeout_id:Dom_html.timeout_id
     -> unit
 
-  val _cancelled : t -> bool
-  val _cancel : t -> unit
+  val cancelled : t -> bool
+  val cancel : t -> unit
 end = struct
   type ids =
     | Empty
@@ -56,13 +56,13 @@ end = struct
     | Ids _ -> invalid_arg "request_ids already set"
   ;;
 
-  let _cancelled x =
+  let cancelled x =
     match !x with
     | Cancelled -> true
     | Empty | Ids _ -> false
   ;;
 
-  let _cancel (t : t) =
+  let cancel (t : t) =
     match !t with
     | Cancelled -> ()
     | Empty -> t := Cancelled
@@ -90,6 +90,13 @@ let request_animation_frame callback =
      requestAnimationFrame, since exceptions raised to that would otherwise not go through
      our ordinary Async monitor. *)
   let request_ids = Request_ids.create () in
+  let callback () =
+    if Request_ids.cancelled request_ids
+    then ()
+    else (
+      Request_ids.cancel request_ids;
+      callback ())
+  in
   let animation_frame_id =
     let animation_callback = Js.wrap_callback (fun _ -> callback ()) in
     Dom_html.window##requestAnimationFrame animation_callback
